@@ -3,6 +3,7 @@ const { isAuthenticated } = require('../middlewares/auth');
 const router = express.Router();
 const postModel = require('../models/postModel');
 const userModel = require('../models/userModel');
+const cloudinary = require('cloudinary');
 
 // Create a post
 router.post('/create', isAuthenticated, async (req, res) => {
@@ -16,10 +17,15 @@ router.post('/create', isAuthenticated, async (req, res) => {
       });
     }
 
+    // cloudinary
+    const cloud = await cloudinary.v2.uploader.upload(imageUrl, {
+      folder: 'Mern-social',
+    });
+
     // create a new post
     const newPost = new postModel({
       caption,
-      imageUrl,
+      imageUrl: cloud.secure_url,
       owner: req.user._id,
     });
 
