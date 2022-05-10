@@ -4,10 +4,12 @@ const app = express();
 const connectDatabase = require('./config/database');
 const cloudinary = require('cloudinary');
 const cors = require('cors');
-const http = require('http');
+const dotenv = require('dotenv');
+const userModel = require('./models/userModel');
+const { Server } = require('socket.io');
 
 // dotenv initilization
-require('dotenv').config({
+dotenv.config({
   path: './config/.env',
 });
 
@@ -15,11 +17,11 @@ require('dotenv').config({
 connectDatabase();
 
 // cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
 // using middlewares
 app.use(express.json({ limit: '50mb' }));
@@ -32,19 +34,15 @@ app.use('/api/user', require('./routes/userRoute'));
 app.use('/api/post', require('./routes/postRoute'));
 
 // using socket
-const server = http.createServer(app);
-const io = require('socket.io')(server, {
+const io = new Server({
   cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
   },
 });
 
-io.on('connection', (socket) => {
-  socket.emit('message', 'Hello Vikas');
-});
+io.on('connection', (socket) => {});
 
 // listening port
-server.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
+io.listen(4000, () => {
+  console.log('Server is running on port 4000');
 });

@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 
 const Home = () => {
-  const [response, setResponse] = useState('');
-
-  const socket = io('http://localhost:4000');
+  const [text, setText] = useState('');
 
   useEffect(() => {
-    socket.on('message', (data) => {
-      setResponse(data);
-    });
+    const socket = io('http://localhost:4000');
   }, []);
 
-  useEffect(() => {});
   return (
     <div>
-      here is the : {response}
-      <input />
+      <input
+        className='border'
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+      />
+      <button>Login</button>
     </div>
   );
 };

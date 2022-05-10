@@ -19,16 +19,16 @@ router.post('/register', async (req, res) => {
     }
 
     // cloudinary
-    const cloud = await cloudinary.v2.uploader.upload(profilePictureUrl, {
-      folder: 'Mern-social',
-    });
+    // const cloud = await cloudinary.v2.uploader.upload(profilePictureUrl, {
+    //   folder: 'Mern-social',
+    // });
 
     // Create a new user
     const newUser = new userModel({
       name,
       email,
       password,
-      profilePictureUrl: cloud.secure_url,
+      profilePictureUrl,
     });
 
     // save user to database
