@@ -20,6 +20,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
     // cloudinary
     const cloud = await cloudinary.v2.uploader.upload(imageUrl, {
       folder: 'Mern-social',
+      public_id: Date.now(),
     });
 
     // create a new post
@@ -71,6 +72,7 @@ router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
       await post.save();
       return res.status(200).json({
         message: 'Post unliked successfully',
+        post,
       });
     } else {
       // like post if user hasn't liked it
@@ -78,6 +80,7 @@ router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
       await post.save();
       res.status(200).json({
         message: 'Post liked successfully',
+        post,
       });
     }
   } catch (error) {
@@ -213,7 +216,9 @@ router.delete('/comment/:id', isAuthenticated, async (req, res) => {
 // Get recent posts
 router.get('/recent', isAuthenticated, async (req, res) => {
   try {
-    const posts = await postModel.find().populate('owner');
+    const posts = await postModel.find().populate('owner').sort({
+      createdAt: -1,
+    });
     res.status(200).json({
       message: 'Recent posts fetched successfully',
       posts,

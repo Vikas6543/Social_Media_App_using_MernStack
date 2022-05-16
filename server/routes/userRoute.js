@@ -19,19 +19,20 @@ router.post('/register', async (req, res) => {
     }
 
     // cloudinary
-    // const cloud = await cloudinary.v2.uploader.upload(profilePictureUrl, {
-    //   folder: 'Mern-social',
-    // });
+    const cloud = await cloudinary.v2.uploader.upload(profilePictureUrl, {
+      folder: 'Mern-social',
+      public_id: `${name}-${Date.now()}`,
+    });
 
     // Create a new user
     const newUser = new userModel({
       name,
       email,
       password,
-      profilePictureUrl,
+      profilePictureUrl: cloud.secure_url,
     });
 
-    // save user to database
+    // // save user to database
     const savedUser = await newUser.save();
 
     res.status(201).json({
@@ -49,6 +50,13 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Please enter all the fields',
+      });
+    }
+
     const user = await userModel.findOne({ email }).select('+password');
 
     // Check if user exists
