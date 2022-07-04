@@ -1,14 +1,11 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
 
 const ProtectedRoute = ({ user, children }) => {
-  const navigate = useNavigate();
-
   useEffect(() => {
     if (!user) {
-      navigate('/');
+      window.location.href = "/";
     }
-  }, []);
+  }, [user]);
 
   return children;
 };

@@ -1,7 +1,10 @@
-import moment from 'moment';
-import Axios from 'axios';
+import moment from "moment";
+import Axios from "axios";
+import { useCookies } from "react-cookie";
 
 const Post = ({ post, getRecentPosts }) => {
+  const [cookies] = useCookies();
+
   const likeHandler = async (id) => {
     try {
       await Axios.get(`/api/post/likeUnlike/${id}`);
@@ -12,7 +15,7 @@ const Post = ({ post, getRecentPosts }) => {
   };
 
   return (
-    <div className='mb-6 border-t'>
+    <div className='mb-4 border-t'>
       {/* post title */}
       <section className='flex justify-between items-center py-3 px-3'>
         <div className='flex items-center cursor-pointer'>
@@ -42,31 +45,42 @@ const Post = ({ post, getRecentPosts }) => {
       </section>
 
       {/* Actions */}
-      <section className='mx-3 mt-2'>
+      <section className='mx-3 mt-2 flex justify-between'>
         <div className='flex'>
           <div className='flex flex-col items-center'>
-            <button>
+            <div>
               <i
                 onClick={() => likeHandler(post._id)}
-                className='fa-solid fa-thumbs-up text-gray-500 cursor-pointer text-2xl'
+                className={
+                  post.likes.includes(cookies.user._id)
+                    ? "fa-solid fa-thumbs-up text-red-500 cursor-pointer text-2xl"
+                    : "fa-solid fa-thumbs-up text-gray-400 cursor-pointer text-2xl"
+                }
               ></i>
-            </button>
+            </div>
             <div>
-              <h3 className='text-sm'>{post.likes.length}</h3>
+              <h3 className='text-sm'>
+                {post.likes.length} {post.likes.length > 1 ? "Likes" : "Like"}
+              </h3>
             </div>
           </div>
+
           <div>
-            <i className='fa-solid fa-comment cursor-pointer text-2xl text-gray-500 ml-4'></i>
+            <div>
+              <i className='fa-solid fa-comment cursor-pointer text-2xl text-gray-500 ml-4'></i>
+            </div>
           </div>
         </div>
 
         <div>
-          <h3 className='text-xs font-semibold text-gray-500'>
-            {moment(post.createdAt)
-              .fromNow()
-              .replace('hour', 'hr')
-              .replace('minutes', 'min')}
-          </h3>
+          <div className='pt-1'>
+            <h3 className='text-xs font-semibold text-gray-500'>
+              {moment(post.createdAt)
+                .fromNow()
+                .replace("hour", "hr")
+                .replace("minutes", "min")}
+            </h3>
+          </div>
         </div>
       </section>
     </div>

@@ -1,22 +1,22 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userSchema = new Schema({
   name: {
     type: String,
-    required: [true, 'Name field is required'],
+    required: [true, "Name field is required"],
   },
   email: {
     type: String,
-    unique: [true, 'Email already exists'],
-    required: [true, 'Email field is required'],
+    unique: [true, "Email already exists"],
+    required: [true, "Email field is required"],
   },
   password: {
     type: String,
-    required: [true, 'Password field is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    required: [true, "Password field is required"],
+    minlength: [6, "Password must be at least 6 characters"],
     select: false,
   },
   profilePictureUrl: {
@@ -25,26 +25,26 @@ const userSchema = new Schema({
   post: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Post',
+      ref: "Post",
     },
   ],
   followers: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
   ],
   following: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
   ],
 });
 
 // hashing the password before saving it to the database
-userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
@@ -61,4 +61,4 @@ userSchema.methods.generateAuthToken = async function () {
   return jwt.sign({ _id: this._id }, process.env.JWT_KEY);
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

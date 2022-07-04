@@ -1,25 +1,25 @@
-const express = require('express');
-const { isAuthenticated } = require('../middlewares/auth');
+const express = require("express");
+const { isAuthenticated } = require("../middlewares/auth");
 const router = express.Router();
-const postModel = require('../models/postModel');
-const userModel = require('../models/userModel');
-const cloudinary = require('cloudinary');
+const postModel = require("../models/postModel");
+const userModel = require("../models/userModel");
+const cloudinary = require("cloudinary");
 
 // Create a post
-router.post('/create', isAuthenticated, async (req, res) => {
+router.post("/create", isAuthenticated, async (req, res) => {
   try {
     const { caption, imageUrl } = req.body;
 
     // check if caption & is provided
     if (!caption || !imageUrl) {
       return res.status(400).json({
-        message: 'Caption and image are required',
+        message: "Caption and image are required",
       });
     }
 
     // cloudinary
     const cloud = await cloudinary.v2.uploader.upload(imageUrl, {
-      folder: 'Mern-social',
+      folder: "Mern-social",
       public_id: Date.now(),
     });
 
@@ -42,7 +42,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
     await user.save();
 
     res.status(201).json({
-      message: 'Post created successfully',
+      message: "Post created successfully",
       post: savedPost,
     });
   } catch (error) {
@@ -53,14 +53,14 @@ router.post('/create', isAuthenticated, async (req, res) => {
 });
 
 // Like & Unlike a post
-router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
+router.get("/likeUnlike/:id", isAuthenticated, async (req, res) => {
   try {
     const post = await postModel.findById(req.params.id);
 
     // check if post doesn't exist
     if (!post) {
       return res.status(404).json({
-        message: 'Post not found',
+        message: "Post not found",
       });
     }
 
@@ -71,7 +71,7 @@ router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
       post.likes.splice(index, 1);
       await post.save();
       return res.status(200).json({
-        message: 'Post unliked successfully',
+        message: "Post unliked successfully",
         post,
       });
     } else {
@@ -79,7 +79,7 @@ router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
       post.likes.push(req.user._id);
       await post.save();
       res.status(200).json({
-        message: 'Post liked successfully',
+        message: "Post liked successfully",
         post,
       });
     }
@@ -91,14 +91,14 @@ router.get('/likeUnlike/:id', isAuthenticated, async (req, res) => {
 });
 
 // Comment on a post
-router.post('/comment/:id', isAuthenticated, async (req, res) => {
+router.post("/comment/:id", isAuthenticated, async (req, res) => {
   try {
     const post = await postModel.findById(req.params.id);
 
     // check if post doesn't exist
     if (!post) {
       return res.status(404).json({
-        message: 'Post not found',
+        message: "Post not found",
       });
     }
 
@@ -115,7 +115,7 @@ router.post('/comment/:id', isAuthenticated, async (req, res) => {
       post.comments[index].comment = req.body.comment;
       await post.save();
       return res.status(200).json({
-        message: 'Comment updated successfully',
+        message: "Comment updated successfully",
       });
     } else {
       // comment on post if user hasn't commented on it
@@ -125,7 +125,7 @@ router.post('/comment/:id', isAuthenticated, async (req, res) => {
       });
       await post.save();
       res.status(200).json({
-        message: 'Comment added successfully',
+        message: "Comment added successfully",
       });
     }
   } catch (error) {
@@ -136,21 +136,21 @@ router.post('/comment/:id', isAuthenticated, async (req, res) => {
 });
 
 // Delete a post
-router.delete('/delete/:id', isAuthenticated, async (req, res) => {
+router.delete("/delete/:id", isAuthenticated, async (req, res) => {
   try {
     const post = await postModel.findById(req.params.id);
 
     // check if post doesn't exist
     if (!post) {
       return res.status(404).json({
-        message: 'Post not found',
+        message: "Post not found",
       });
     }
 
     // check if user is owner of post
     if (post.owner.toString() !== req.user._id.toString()) {
       return res.status(401).json({
-        message: 'You are not authorized to delete this post',
+        message: "You are not authorized to delete this post",
       });
     }
 
@@ -165,7 +165,7 @@ router.delete('/delete/:id', isAuthenticated, async (req, res) => {
     user.post.splice(index, 1);
     await user.save();
     res.status(200).json({
-      message: 'Post deleted successfully',
+      message: "Post deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -175,14 +175,14 @@ router.delete('/delete/:id', isAuthenticated, async (req, res) => {
 });
 
 // Delete a comment
-router.delete('/comment/:id', isAuthenticated, async (req, res) => {
+router.delete("/comment/:id", isAuthenticated, async (req, res) => {
   try {
     const post = await postModel.findById(req.params.id);
 
     // check if post doesn't exist
     if (!post) {
       return res.status(404).json({
-        message: 'Post not found',
+        message: "Post not found",
       });
     }
 
@@ -193,7 +193,7 @@ router.delete('/comment/:id', isAuthenticated, async (req, res) => {
 
     if (!postExists) {
       return res.status(404).json({
-        message: 'Comment not found',
+        message: "Comment not found",
       });
     }
 
@@ -204,7 +204,7 @@ router.delete('/comment/:id', isAuthenticated, async (req, res) => {
     post.comments.splice(index, 1);
     await post.save();
     res.status(200).json({
-      message: 'Comment deleted successfully',
+      message: "Comment deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -214,13 +214,13 @@ router.delete('/comment/:id', isAuthenticated, async (req, res) => {
 });
 
 // Get recent posts
-router.get('/recent', isAuthenticated, async (req, res) => {
+router.get("/recent", isAuthenticated, async (req, res) => {
   try {
-    const posts = await postModel.find().populate('owner').sort({
+    const posts = await postModel.find().populate("owner").sort({
       createdAt: -1,
     });
     res.status(200).json({
-      message: 'Recent posts fetched successfully',
+      message: "Recent posts fetched successfully",
       posts,
     });
   } catch (error) {

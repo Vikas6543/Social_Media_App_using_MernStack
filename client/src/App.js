@@ -1,22 +1,25 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import Posts from './components/home';
-import CreatePost from './components/createPost';
-import Notifications from './components/notifications';
-import Profile from './components/profile';
-import ProtectedRoute from './components/utils/ProtectedRoute';
-import { useCookies } from 'react-cookie';
+import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import Posts from "./components/dashboard";
+import CreatePost from "./components/createPost";
+import MyProfile from "./components/myProfile";
+import UserProfile from "./components/userProfile";
+import Followers from "./components/myProfile/Followers";
+import Following from "./components/myProfile/Following";
+import ProtectedRoute from "./components/utils/ProtectedRoute";
+import { useCookies } from "react-cookie";
+import BottomNavigations from "./components/bottomNavigations";
 
 const App = () => {
   const [cookies, setCookie] = useCookies();
 
   return (
     <BrowserRouter>
-      <div className='flex justify-center items-center px-4 py-2 fixed top-0 w-full bg-red-500 text-white'>
-        <h3 className='font-bold text-2xl'>Viks Share</h3>
-      </div>
+      <nav className='flex justify-center items-center px-4 py-2 fixed top-0 w-full bg-red-500 text-white'>
+        <h3 className='font-bold text-2xl'>Socially</h3>
+      </nav>
 
       <Routes>
         <Route path='/' element={<Login />} />
@@ -37,65 +40,20 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
-          path='/notifications'
+          path='/my-profile'
           element={
             <ProtectedRoute user={cookies.user}>
-              <Notifications />
+              <MyProfile />
             </ProtectedRoute>
           }
         />
-        <Route
-          path='/profile'
-          element={
-            <ProtectedRoute user={cookies.user}>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path='/userProfile/:id' element={<UserProfile />} />
+        <Route path='/my-profile/followers' element={<Followers />} />
+        <Route path='/my-profile/following' element={<Following />} />
       </Routes>
 
-      {/* bottom tabs */}
-      {cookies.user && (
-        <div className='flex justify-between items-center px-3 py-2 fixed bottom-0 w-full bg-gray-500 text-white'>
-          <Link to='/dashboard' className='flex flex-col items-center'>
-            <div>
-              <i className='fa-solid fa-house text-xl'></i>
-            </div>
-            <div>
-              <h3 className='text-sm'>Home</h3>
-            </div>
-          </Link>
-
-          <Link to='/createPost' className='flex flex-col items-center'>
-            <div>
-              <i className='fa-solid fa-circle-plus text-xl'></i>
-            </div>
-            <div>
-              <h3 className='text-sm'>Add Post</h3>
-            </div>
-          </Link>
-
-          <Link to='/notifications' className='flex flex-col items-center'>
-            <div>
-              <i className='fa-solid fa-bell text-xl'></i>
-            </div>
-            <div>
-              <h3 className='text-sm'>Notifications</h3>
-            </div>
-          </Link>
-
-          <Link to='/profile' className='flex flex-col items-center'>
-            <div>
-              <i className='fa-solid fa-user text-xl'></i>
-            </div>
-            <div>
-              <h3 className='text-sm'>Profile</h3>
-            </div>
-          </Link>
-        </div>
-      )}
+      <BottomNavigations cookies={cookies} />
     </BrowserRouter>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,20 +11,18 @@ import {
   Paper,
   TextField,
   Typography,
-} from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import LoadingSpinner from '../utils/LoadingSpinner';
-import Axios from 'axios';
-import { useCookies } from 'react-cookie';
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import LoadingSpinner from "../utils/LoadingSpinner";
+import Axios from "axios";
+import { useCookies } from "react-cookie";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies();
-
-  const navigate = useNavigate();
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -35,13 +33,13 @@ const Login = () => {
     setLoading(true);
     try {
       setLoading(true);
-      const { data } = await Axios.post('/api/user/login', {
+      const { data } = await Axios.post("/api/user/login", {
         email,
         password,
       });
-      setCookie('user', data.user, { path: '/' });
+      setCookie("user", data.user, { path: "/" });
       setLoading(false);
-      navigate('/dashboard');
+      window.location.href = "/dashboard";
     } catch (error) {
       alert(error.response.data.message);
       setLoading(false);
@@ -50,8 +48,8 @@ const Login = () => {
 
   return (
     <Container maxWidth='xs'>
-      <Box component='form' marginTop={{ xs: '10rem', sm: '5rem' }}>
-        <Paper elevation={3} sx={{ p: { sm: '3rem', xs: '2rem' } }}>
+      <Box component='form' marginTop={{ xs: "10rem", sm: "5rem" }}>
+        <Paper elevation={3} sx={{ p: { sm: "3rem", xs: "2rem" } }}>
           <Typography mb={2} variant='h4' align='center'>
             Login
           </Typography>
@@ -77,11 +75,11 @@ const Login = () => {
             </InputLabel>
             <OutlinedInput
               id='outlined-adornment-password'
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               endAdornment={
-                <InputAdornment sx={{ cursor: 'pointer' }} position='end'>
+                <InputAdornment sx={{ cursor: "pointer" }} position='end'>
                   {showPassword ? (
                     <i
                       onClick={handleShowPassword}
@@ -105,7 +103,7 @@ const Login = () => {
             sx={{ mt: 3, mb: 2 }}
             onClick={submitHandler}
           >
-            {loading ? <LoadingSpinner /> : 'Login'}
+            {loading ? <LoadingSpinner /> : "Login"}
           </Button>
           <Grid container>
             <Grid item>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,24 +11,20 @@ import {
   Paper,
   TextField,
   Typography,
-} from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import LoadingSpinner from '../utils/LoadingSpinner';
-import Axios from 'axios';
-import { useCookies } from 'react-cookie';
-import { useDispatch } from 'react-redux';
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import LoadingSpinner from "../utils/LoadingSpinner";
+import Axios from "axios";
+import { useCookies } from "react-cookie";
 
 const Register = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cookies, setCookie] = useCookies();
-  const [profilePictureUrl, setProfilePictureUrl] = useState('');
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [profilePictureUrl, setProfilePictureUrl] = useState("");
 
   // password visibility toggle
   const handleShowPassword = () => {
@@ -54,16 +50,15 @@ const Register = () => {
     setLoading(true);
     try {
       setLoading(true);
-      const { data } = await Axios.post('/api/user/register', {
+      const { data } = await Axios.post("/api/user/register", {
         name,
         email,
         password,
         profilePictureUrl,
       });
-      setCookie('user', data.user, { path: '/' });
-      dispatch({ type: 'SET_USER', payload: data.user });
+      setCookie("user", data.user, { path: "/" });
       setLoading(false);
-      navigate('/dashboard');
+      window.location.href = "/dashboard";
     } catch (error) {
       alert(error.response.data.message);
       setLoading(false);
@@ -72,8 +67,8 @@ const Register = () => {
 
   return (
     <Container maxWidth='xs'>
-      <Box component='form' marginTop={{ xs: '5rem', sm: '3rem' }}>
-        <Paper elevation={3} sx={{ p: { sm: '3rem', xs: '2rem' } }}>
+      <Box component='form' marginTop={{ xs: "5rem", sm: "3rem" }}>
+        <Paper elevation={3} sx={{ p: { sm: "3rem", xs: "2rem" } }}>
           <Typography variant='h4' align='center'>
             Register
           </Typography>
@@ -109,11 +104,11 @@ const Register = () => {
             </InputLabel>
             <OutlinedInput
               id='outlined-adornment-password'
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               endAdornment={
-                <InputAdornment sx={{ cursor: 'pointer' }} position='end'>
+                <InputAdornment sx={{ cursor: "pointer" }} position='end'>
                   {showPassword ? (
                     <i
                       onClick={handleShowPassword}
@@ -142,7 +137,7 @@ const Register = () => {
             sx={{ mt: 3, mb: 2 }}
             onClick={submitHandler}
           >
-            {loading ? <LoadingSpinner /> : 'Register'}
+            {loading ? <LoadingSpinner /> : "Register"}
           </Button>
           <Grid container>
             <Grid item xs>

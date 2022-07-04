@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { isAuthenticated } = require('../middlewares/auth');
-const userModel = require('../models/userModel');
-const postModel = require('../models/postModel');
-const cloudinary = require('cloudinary');
+const { isAuthenticated } = require("../middlewares/auth");
+const userModel = require("../models/userModel");
+const postModel = require("../models/postModel");
+const cloudinary = require("cloudinary");
 
 // Register a user
-router.post('/register', async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const { name, email, password, profilePictureUrl } = req.body;
     let user = await userModel.findOne({ email });
@@ -14,13 +14,13 @@ router.post('/register', async (req, res) => {
     // Check if user already exists
     if (user) {
       return res.status(400).json({
-        message: 'User already exists',
+        message: "User already exists",
       });
     }
 
     // cloudinary
     const cloud = await cloudinary.v2.uploader.upload(profilePictureUrl, {
-      folder: 'Mern-social',
+      folder: "Mern-social",
       public_id: `${name}-${Date.now()}`,
     });
 
@@ -36,7 +36,7 @@ router.post('/register', async (req, res) => {
     const savedUser = await newUser.save();
 
     res.status(201).json({
-      message: 'User Registered successfully',
+      message: "User Registered successfully",
       user: savedUser,
     });
   } catch (error) {
@@ -47,22 +47,22 @@ router.post('/register', async (req, res) => {
 });
 
 // Login a user
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
-        message: 'Please enter all the fields',
+        message: "Please enter all the fields",
       });
     }
 
-    const user = await userModel.findOne({ email }).select('+password');
+    const user = await userModel.findOne({ email }).select("+password");
 
     // Check if user exists
     if (!user) {
       return res.status(400).json({
-        message: 'User does not exist',
+        message: "User does not exist",
       });
     }
 
@@ -70,7 +70,7 @@ router.post('/login', async (req, res) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(400).json({
-        message: 'Incorrect password',
+        message: "Incorrect password",
       });
     }
 
@@ -84,8 +84,8 @@ router.post('/login', async (req, res) => {
     };
 
     // Set cookie & response
-    res.status(200).cookie('token', token, options).json({
-      message: 'User logged in successfully',
+    res.status(200).cookie("token", token, options).json({
+      message: "User logged in successfully",
       user,
       token,
     });
@@ -97,14 +97,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Logout a user
-router.get('/logout', async (req, res) => {
+router.get("/logout", async (req, res) => {
   try {
     // remove cookie token
     res
       .status(200)
-      .cookie('token', '', { expires: new Date(Date.now()), httpOnly: true })
+      .cookie("token", "", { expires: new Date(Date.now()), httpOnly: true })
       .json({
-        message: 'User logged out successfully',
+        message: "User logged out successfully",
       });
   } catch (error) {
     res.status(500).json({
@@ -114,16 +114,16 @@ router.get('/logout', async (req, res) => {
 });
 
 // Update a password
-router.get('/updatePassword', isAuthenticated, async (req, res) => {
+router.get("/updatePassword", isAuthenticated, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const user = await userModel.findById(req.user._id).select('+password');
+    const user = await userModel.findById(req.user._id).select("+password");
 
     // Check if password is correct
     const isMatch = await user.matchPassword(oldPassword);
     if (!isMatch) {
       return res.status(400).json({
-        message: 'Old Password is incorrect',
+        message: "Old Password is incorrect",
       });
     }
 
@@ -132,7 +132,7 @@ router.get('/updatePassword', isAuthenticated, async (req, res) => {
     await user.save();
 
     res.status(200).json({
-      message: 'Password updated successfully',
+      message: "Password updated successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -142,7 +142,7 @@ router.get('/updatePassword', isAuthenticated, async (req, res) => {
 });
 
 // Update a profile
-router.get('/updateProfile', isAuthenticated, async (req, res) => {
+router.post("/updateProfile", isAuthenticated, async (req, res) => {
   try {
     const { name, email, profilePictureUrl } = req.body;
     const user = await userModel.findById(req.user._id);
@@ -161,7 +161,7 @@ router.get('/updateProfile', isAuthenticated, async (req, res) => {
     await user.save();
 
     res.status(200).json({
-      message: 'User updated successfully',
+      message: "User updated successfully",
       user,
     });
   } catch (error) {
@@ -172,7 +172,7 @@ router.get('/updateProfile', isAuthenticated, async (req, res) => {
 });
 
 // Delete an account
-router.delete('/deleteAccount', isAuthenticated, async (req, res) => {
+router.delete("/deleteAccount", isAuthenticated, async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id);
     const usersPosts = user.post;
@@ -205,10 +205,10 @@ router.delete('/deleteAccount', isAuthenticated, async (req, res) => {
     }
 
     // remove cookie token
-    res.cookie('token', '', { expires: new Date(Date.now()), httpOnly: true });
+    res.cookie("token", "", { expires: new Date(Date.now()), httpOnly: true });
 
     res.status(200).json({
-      message: 'User account deleted successfully',
+      message: "User account deleted successfully",
     });
   } catch (error) {
     res.status(500).json({
@@ -218,14 +218,14 @@ router.delete('/deleteAccount', isAuthenticated, async (req, res) => {
 });
 
 // Get my profile
-router.get('/myProfile', isAuthenticated, async (req, res) => {
+router.get("/myProfile", isAuthenticated, async (req, res) => {
   try {
     const user = await userModel
       .findById(req.user._id)
-      .populate('post followers following');
+      .populate("post followers following");
 
     res.status(200).json({
-      message: 'User profile fetched successfully',
+      message: "User profile fetched successfully",
       user,
     });
   } catch (error) {
@@ -236,21 +236,21 @@ router.get('/myProfile', isAuthenticated, async (req, res) => {
 });
 
 // Get other user profile
-router.get('/userProfile/:id', async (req, res) => {
+router.get("/userProfile/:id", async (req, res) => {
   try {
     const user = await userModel
       .findById(req.params.id)
-      .populate('post followers following');
+      .populate("post followers following");
 
     // Check if user exists
     if (!user) {
       return res.status(400).json({
-        message: 'User does not exist',
+        message: "User does not exist",
       });
     }
 
     res.status(200).json({
-      message: 'User profile fetched successfully',
+      message: "User profile fetched successfully",
       user,
     });
   } catch (error) {
@@ -261,7 +261,7 @@ router.get('/userProfile/:id', async (req, res) => {
 });
 
 // Follow & Unfollow a user
-router.get('/followUnfollow/:id', isAuthenticated, async (req, res) => {
+router.get("/followUnfollow/:id", isAuthenticated, async (req, res) => {
   try {
     const userToFollow = await userModel.findById(req.params.id);
     const loggedInUser = await userModel.findById(req.user._id);
@@ -269,7 +269,7 @@ router.get('/followUnfollow/:id', isAuthenticated, async (req, res) => {
     // Check if user exists
     if (!userToFollow) {
       return res.status(400).json({
-        message: 'User not found',
+        message: "User not found",
       });
     }
 
@@ -287,7 +287,7 @@ router.get('/followUnfollow/:id', isAuthenticated, async (req, res) => {
       await loggedInUser.save();
 
       res.status(200).json({
-        message: 'User Unfollowed successfully',
+        message: "User Unfollowed successfully",
       });
     } else {
       // following
@@ -301,7 +301,7 @@ router.get('/followUnfollow/:id', isAuthenticated, async (req, res) => {
       await userToFollow.save();
 
       res.status(200).json({
-        message: 'User followed successfully',
+        message: "User followed successfully",
       });
     }
   } catch (error) {
@@ -312,7 +312,7 @@ router.get('/followUnfollow/:id', isAuthenticated, async (req, res) => {
 });
 
 // Get all posts of following users
-router.get('/getFollowingPosts', isAuthenticated, async (req, res) => {
+router.get("/getFollowingPosts", isAuthenticated, async (req, res) => {
   try {
     const loggedInUser = await userModel.findById(req.user._id);
 
@@ -321,11 +321,11 @@ router.get('/getFollowingPosts', isAuthenticated, async (req, res) => {
       .find({
         _id: { $in: loggedInUser.following },
       })
-      .populate('post')
-      .select('post');
+      .populate("post")
+      .select("post");
 
     res.status(200).json({
-      message: 'Following posts fetched successfully',
+      message: "Following posts fetched successfully",
       posts,
     });
   } catch (error) {
